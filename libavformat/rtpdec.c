@@ -622,6 +622,10 @@ static void finalize_packet(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestam
     s->timestamp = timestamp;
     pkt->pts     = s->unwrapped_timestamp + s->range_start_offset -
                    s->base_timestamp;
+
+    pkt->last_rtcp_ntp_time = s->last_rtcp_ntp_time;
+    pkt->last_rtcp_timestamp = s->last_rtcp_timestamp;
+    pkt->timestamp = s->timestamp;
 }
 
 static int rtp_parse_packet_internal(RTPDemuxContext *s, AVPacket *pkt,

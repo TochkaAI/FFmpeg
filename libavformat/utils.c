@@ -1574,6 +1574,10 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 
     av_init_packet(pkt);
 
+    uint64_t last_rtcp_ntp_time = 0;
+    uint32_t last_rtcp_timestamp = 0;
+    uint32_t timestamp = 0;
+
     while (!got_packet && !s->internal->parse_queue) {
         AVStream *st;
         AVPacket cur_pkt;
@@ -1595,6 +1599,10 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         }
         ret = 0;
         st  = s->streams[cur_pkt.stream_index];
+
+        last_rtcp_ntp_time = cur_pkt.last_rtcp_ntp_time;
+        last_rtcp_timestamp = cur_pkt.last_rtcp_timestamp;
+        timestamp = cur_pkt.timestamp;
 
         /* update context if required */
         if (st->internal->need_context_update) {
@@ -1761,6 +1769,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
                av_ts2str(pkt->pts),
                av_ts2str(pkt->dts),
                pkt->size, pkt->duration, pkt->flags);
+
+    pkt->last_rtcp_ntp_time = last_rtcp_ntp_time;
+    pkt->last_rtcp_timestamp = last_rtcp_timestamp;
+    pkt->timestamp = timestamp;
 
     return ret;
 }
